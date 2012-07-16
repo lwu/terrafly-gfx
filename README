@@ -1,0 +1,133 @@
+
+Leslie Wu
+Terrify, a VDR terrain rendering system.
+
+Implementation details
+----------------------
+
+Overview:
+
+Terrify is a terrain visualization program that implements
+view-dependent refinement, screen-space error control, frustum
+culling, and optionally enforces a strict polygon budget. 
+
+Terrify is based mostly on Lindstrom and Pascucci's work in
+"Visualization of Large Terrains Made Easy". It adopts their
+pre-calculation and runtime methods for view-dependent refinement
+(except their indexing scheme), but extends the framework to either
+support a strict polygon budget or to amortize the cost of updating
+the terrain over multiple frames without multithreaded programming.
+
+
+Offline processing:
+
+A short (several seconds on a Gigahertz machine, for a 4x2k data set)
+preprocessing phase computes error terms used at run-time for
+view-dependent refinement. We implement Lindstrom and Pascucci's
+method that computes a nested sphere hierarchy of errors. For fast
+processing, we use dynamic programming to memoize the results of the
+top-down error term computation.
+
+For each vertex, the preprocessing phase produces a radius term and an
+error term. The error term is assumed to be between 0 and 255 so it is
+stored as a unsigned byte. The radius term exceeds 255, but there are
+only ~lg(n) possible radial terms, where n is the dimension of the
+data set. Thus, we compress the data, storing a 256 element lookup
+table as well as the radial index in bytes.
+
+
+View-Dependent Refinement and Error Control:
+
+The rendering follows Lindstrom and Pascucci's top-down mesh
+refinement algorithm. We traverse the regularly subdivided mesh
+top-down, stopping recursive subdivision of a triangle if the error is
+lower than a user-specified parameter.
+
+Triangle elements are normally drawn using the glBegin(GL_TRIANGLES);
+command. We did not implement triangle stripping because enforcing a
+strict polygon budget in general alters the triangle traversal,
+destroying the inherent coherency.
+
+Error control works naturally as part of the recursive triangle
+subdivision.
+
+
+Polygon Budget:
+
+Lindstrom and Pascucci do not implement a polygon budget. We chose two
+non-conflicting approaches.
+
+First, we noticed that to ensure a crack-free tesselation, it is
+sufficient to guarantee that there exists an error value such that all
+vertices that have a higher error (as defined in section 3.1.2 [1])
+are active while all the vertices that have a lower error are
+inactive.
+
+The function call stack normally encodes what triangles are going to
+be subdivided. In terms of the implicit bintree structure of the
+terrain set, this is equivalent to a depth-first search. Instead, we
+use a priority queue and continually subdivide the triangle with the
+highest error, putting its children into the priority queue.
+
+We stop once (# triangles drawn + # triangles in queue >= triangle
+limit) to ensure that the total number of triangles drawn at less than
+the triangle limit. Additionally we must triangle a few extra
+triangles that have the same error as the cutoff error
+value. Otherwise, we are not guaranteed a watertight tesselation.
+
+The other approach simply increases or decreases tau, the pixel error,
+to approximate the triangle limit. We implemented this system for
+efficiency reasons. The priority queue method slowed down the
+framerate by slightly more than a factor of 2.
+
+
+Frustum Culling:
+
+We cull based on the left and right view frustums. Note that we do not
+do top and bottom view frustum culling. The error metric and top-down
+refinement procedure described in [1] do not work with top and bottom
+frustum culling; They assume that the viewing direction is parallel to
+the ground plane.
+
+Optionally, we permit the user to enable "X-axis rotation
+compensation". This simply increases the view angle as the user looks
+down.
+
+
+Amortization:
+
+To further increase framerate, we amortize the cost of updating the
+terrain over several frames, without using threads. 
+
+We divide the polygon budget into N buckets, and render approximately
+1/N*triangle_limit triangles per frame, storing the results in a
+vertex array. Every N frames, we swap the pointers that denote the
+vertex array we are drawing and the vertex array we are updating.
+In our implementation N=4, though this can easily be changed.
+
+This results in a typical 2-5x speedup, depending on the number of
+triangles in the current tesselation. To avoid popping artifacts when
+the user turns to the right or left, we increase the view angle in one
+direction based upon the speed of viewpoint rotation.
+
+
+Results:
+
+On the P3 lab machines, we ran a timedemo benchmark that computes the
+average framerate over 90 frames, while the viewpoint traverses the
+terrain from one corner to the other.
+
+[4097x2049 data set, 4096x2048 texture with trilinear mipmapping,
+4-pixel error, 32k triangle limit. 640x480 resolution. CVA = Compiled
+Vertex Arrays]
+
+	 16.1fps	Priority Queue, 4-pixel error
+	 41.6fps	Normal, 4-pixel error
+	 51.0fps	Priority Queue w/ CVA Amortization
+	110.8fps	Normal w/ CVA Amortization
+
+References:
+
+1: 
+Peter Lindstrom and Valerio Pascucci. "Visualization of Large
+Terrains Made Easy." IEEE Visualization 2001
