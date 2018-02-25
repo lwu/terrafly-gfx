@@ -1,5 +1,5 @@
 //
-// Terrify!
+// Terrifly!
 // 
 // Leslie Wu
 //
@@ -104,7 +104,7 @@ public:
 
     void apply_camera();
 
-	void update_rot();
+	void update_rotation();
 	void update_pos();
 
 public:
@@ -425,7 +425,7 @@ bool GUI::mouse_up(int *where, int which)
 	return true;
 }
 
-void GUI::update_rot() {
+void GUI::update_rotation() {
 	Vec3f dir(0.0f, 1.0f, 0.0f);
 	forward = rotate_direction(dir, theta, up);
 
@@ -509,7 +509,7 @@ void GUI::update_animation()
 
 		bound_range(&phi, -85.0f, 60.0f);
 		
-		update_rot();
+		update_rotation();
 	} else {
 		dtheta = 0.0f;
 	}
@@ -587,7 +587,7 @@ bool GUI::key_press(int key)
         }
 
 	if (update_dir) {
-		update_rot();
+		update_rotation();
 		update_dir = false;
 	}
 
@@ -693,7 +693,7 @@ void init_terrain()
 
 void init_gui()
 {	
-	gui.toplevel->label("Terrify");
+	gui.toplevel->label("Terrifly");
 
 	int width = gui.terrain.z->width();
     int height = gui.terrain.z->height();
@@ -712,7 +712,7 @@ void init_gui()
 
     gui.up = Vec3f(0, 0, 1);
 
-	gui.update_rot();
+	gui.update_rotation();
 
     gui.add_toggle_menu("&Terrain/Draw Texture", FL_CTRL+'x',
 			gui.will_draw_texture);

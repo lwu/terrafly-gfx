@@ -1,17 +1,17 @@
 
 Leslie Wu
-Terrify, a VDR terrain rendering system.
+Terrifly, a VDR terrain rendering system.
 
 Implementation details
 ----------------------
 
 Overview:
 
-Terrify is a terrain visualization program that implements
+Terrifly is a terrain visualization program that implements
 view-dependent refinement, screen-space error control, frustum
 culling, and optionally enforces a strict polygon budget. 
 
-Terrify is based mostly on Lindstrom and Pascucci's work in
+Terrifly is based mostly on Lindstrom and Pascucci's work in
 "Visualization of Large Terrains Made Easy". It adopts their
 pre-calculation and runtime methods for view-dependent refinement
 (except their indexing scheme), but extends the framework to either
