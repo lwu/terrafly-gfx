@@ -1,5 +1,5 @@
 //
-// Terrifly!
+// Terrafly!
 // 
 // Leslie Wu
 //
@@ -693,7 +693,7 @@ void init_terrain()
 
 void init_gui()
 {	
-	gui.toplevel->label("Terrifly");
+	gui.toplevel->label("Terrafly");
 
 	int width = gui.terrain.z->width();
     int height = gui.terrain.z->height();
@@ -762,7 +762,7 @@ void init_gui()
 
 int main(int argc, char *argv[])
 {	
-	cout << "\nTerrify, by Leslie Wu\n" << endl;
+	cout << "\nTerrafly, by Leslie Wu\n" << endl;
 
     gui.initialize(argc, argv);
 

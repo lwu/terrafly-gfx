@@ -1,17 +1,37 @@
 
 Leslie Wu
-Terrifly, a VDR terrain rendering system.
+Terrafly, a VDR terrain rendering system.
+
+High-level Background
+---------------------
+
+Computer graphics can be used to display 3-D geometry such as mountains and valleys.
+For example, consider an app that lets you fly over the Grand Canyon to enjoy the view.
+Alternatively, imagine that you are a scientist seeking to understand the terrain of
+this planet (or one day another!).
+
+In this field of graphics, to "render" a scene means to take underlying geometry
+(points, lines, triangles and so on) and turn that into something a human can see.
+One of the biggest successes for this field was in showing that such techniques
+could be used to make animated shorts and movies (Pixar anyone?).
+
+These files are source code that can be turned into a program that can run on your
+computer or other mobile device. They provide a reference implementation, albeit
+modified, of an old school graphics/visualization paper. If you are interested in
+learning how to quickly display terrain in a way (that is, with high frames per second), 
+take a look here.
+
 
 Implementation details
 ----------------------
 
 Overview:
 
-Terrifly is a terrain visualization program that implements
+Terrafly is a terrain visualization program that implements
 view-dependent refinement, screen-space error control, frustum
 culling, and optionally enforces a strict polygon budget. 
 
-Terrifly is based mostly on Lindstrom and Pascucci's work in
+Terrafly is based mostly on Lindstrom and Pascucci's work in
 "Visualization of Large Terrains Made Easy". It adopts their
 pre-calculation and runtime methods for view-dependent refinement
 (except their indexing scheme), but extends the framework to either
